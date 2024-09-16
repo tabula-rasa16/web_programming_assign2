@@ -1,0 +1,4 @@
+flask
+pymysql
+crypto-js
+ripemd160

@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <title>login/signup</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        .container {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+        input {
+            margin: 0.5rem 0;
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        button {
+            margin-top: 1rem;
+            padding: 0.5rem;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        #toggleButton {
+            background-color: #6c757d;
+        }
+        #toggleButton:hover {
+            background-color: #545b62;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 id="formTitle">Login</h1>
+        <form id="authForm" method="post" action="javascript:void(0);">
+            <input type="text" id="username" name="username" placeholder="username" required>
+            <input type="password" id="password" name="password" placeholder="password" required>
+            <button type="submit" id="submitButton">Login</button>
+        </form>
+        <a id="toggleLink" href="#">Don't have an account? Click here to register</a>
+    </div>
+
+    <script>
+       
+            const formTitle = document.getElementById('formTitle');
+            const authForm = document.getElementById('authForm');
+            const submitButton = document.getElementById('submitButton');
+            const toggleLink = document.getElementById('toggleLink');
+            let isLogin = true; 
+       
+
+
+        // 从服务器获取公钥
+        // async function getPublicKey() {
+        //     const response = await fetch('/getPublicKey');
+        //     const data = await response.json();
+        //     return data.data.public_key;
+        // }
+
+        // 加密密码并发送到服务器
+        // async function encryptAndSendPassword(password) {
+        //     try {
+        //         // 获取公钥
+        //         const publicKey = await getPublicKey();
+
+        //         // 使用公钥加密密码
+        //         // 使用 JSEncrypt 进行 RSA 加密
+        //         const encrypt = new JSEncrypt();
+        //         encrypt.setPublicKey(publicKey);
+        //         const encryptedPassword = encrypt.encrypt(password);
+
+        //         // 发送加密后的密码到服务器
+        //         const response = await fetch('/register_or_login', {
+        //             method: 'POST',
+        //             headers: {
+        //                 'Content-Type': 'application/json',
+        //             },
+        //             body: JSON.stringify({ encrypted_password: encryptedPassword }),
+        //         });
+
+        //         const result = await response.json();
+        //         return result;
+        //     } catch (error) {
+        //         console.error('Error during encryption and sending:', error);
+        //         throw error;
+        //     }
+        // }
+
+
+        function transToRegister(){
+            isLogin = !isLogin;
+            formTitle.textContent = isLogin ? 'Login' : 'Register';
+            submitButton.textContent = isLogin ? 'Login' : 'Register';
+            toggleLink.innerText = isLogin ? 'Don\'t have an account? Click here to register' : 'Already have an account? Click here to login';
+        };
+
+        toggleLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            transToRegister();
+        });
+
+        async function submitForm(e) {
+            e.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            console.log(isLogin ? 'login' : 'register', { username, password });
+            const apiName = isLogin ? '/login' : '/register';
+
+            try {
+            
+                const response = await fetch(apiName, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ 
+                        username: username,
+                        password: password}),
+                });
+
+                const result = await response.json();
+                if (result.code == 200 && isLogin) {
+                    // 登录成功，重定向到成功页面
+                    alert(result.message);
+                    window.location.href = '/home';
+                } else if (result.code == 200 && !isLogin) {
+                    // 注册成功，渲染为登录页
+                    alert(result.message);
+                    transToRegister();
+                }
+                else {
+                    // 显示错误消息
+                    alert(result.message);
+                }
+                // return result;
+            } catch (error) {
+                console.error('Error during encryption and sending:', error);
+                throw error;
+            }
+        }
+        authForm.addEventListener('submit', submitForm);
+
+    </script>
+</body>
+</html>
