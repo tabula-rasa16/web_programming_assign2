@@ -42,7 +42,7 @@ SALT = "SUNZ0027".encode('utf-8')
 
 # Create a MySQL connector
 
-db = pymysql.connect(host='localhost', port =13306, user='root', password='5903q1w2e3@Q', db='user_system', charset='utf8mb3') #本地
+db = pymysql.connect(host='localhost', port =13306, user='root', password='', db='user_system', charset='utf8mb3') #本地
 cursor = db.cursor()
 
 cursor.execute("SELECT VERSION()")
